@@ -1,8 +1,8 @@
 def letters(s):
     letterCount = []
-    s = s.lower() # Case does not matter
-    for i in range(0, 26): # Loop 0 - 25 representing 26 letters
-        letterCount.append(s.count(chr(i + 97))) # Count letters via ASCII
+    s = s.lower()  # Case does not matter
+    for i in range(0, 26):  # Loop 0 - 25 representing 26 letters
+        letterCount.append(s.count(chr(i + 97)))  # Count letters via ASCII
     return letterCount
 
 
@@ -15,9 +15,9 @@ def bar_print(L26, height):
     for k in range(0, len(L26)):
         L26[k] *= scalingFactor
     # Graph creation
-    for x in range(0, maxNum + 1):  
+    for x in range(0, maxNum + 1):
         temp = ""
-	# Construct graph line-by-line 
+        # Construct graph line-by-line
         for i in L26:
             if (i <= maxNum - x):
                 temp += "  "
@@ -45,8 +45,8 @@ def flatten(L):
     flattened = L
     while True:
         done = True
-	# Algorithm flattens only nested lists
-	# Loop needed for same-level lists
+        # Algorithm flattens only nested lists
+        # Loop needed for same-level lists
         for i in range(0, len(flattened)):
             if isinstance(flattened[i], list):
                 done = False
@@ -82,4 +82,3 @@ print(cross([2, 1, 0], [3, 4, 0]))
 print(flatten([0, 1, [2, 3], 4]))
 print([1, 2, [3, 4, [5, [6, 7, 8], [9, 10]], 11, [12, [13, 14], [15, 16]]]])
 print(flatten([1, 2, [3, 4, [5, [6, 7, 8], [9, 10]], 11, [12, [13, 14], [15, 16]]]]))
-
