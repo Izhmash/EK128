@@ -55,9 +55,7 @@ def polar_difference(P, Q):
 def order3(one, two, three):
     return sorted([one, two, three])
 
-COMMENT['explanation'] = """This program loops through the string and then through
-                            a list containing the vowels.  Checks if there is a vowel
-                            and shifts that vowel by one"""
+COMMENT['explanation'] = """This program loops through the string and then through a list containing the vowels.  Checks if there is a vowel and shifts that vowel by one"""
 
 
 def vowel_shift(S):
@@ -74,11 +72,12 @@ def vowel_shift(S):
                     shifted[j] = "a"
                 else:
                     shifted[j] = vowelsL[k + 1]
+                    break
             if (shifted[j] == vowelsU[k]):
                 if (shifted[j] == "U"):
                     shifted[j] = "A"
                 else:
                     shifted[j] = vowelsU[k + 1]
+                    break
     shifted = str(shifted)
     return shifted
-print(vowel_shift("This is a test"))
