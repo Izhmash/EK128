@@ -41,15 +41,28 @@ def polar_difference(P, Q):
     thetaP = P[1]
     rQ = Q[0]
     thetaQ = Q[1]
-    thetaDiff = thetaP - thetaQ
     xP = rP*math.cos(thetaP)
     yP = rP*math.sin(thetaP)
     xQ = rQ*math.cos(thetaQ)
     yQ = rQ*math.sin(thetaQ)
     rDiff = math.sqrt((xP - xQ)**2 + (yP - yQ)**2)
-    return (thetaDiff, rDiff)
+    # Checks different types of Q and P value combinations
+    if xQ > xP and yP > yQ:
+        thetaDiff = math.pi - math.atan(abs((yP - yQ) / (xP - xQ)))
+    elif xP > xQ and yQ > yP:
+        thetaDiff = -math.atan(abs((yP-yQ)/(xP-xQ)))
+    elif xP > xQ and yP > yQ:
+        thetaDiff = math.atan(abs((yP-yQ)/(xP-xQ)))
+    elif xQ > xP and yQ > yP:
+        thetaDiff = -(math.pi - math.atan(abs((yP-yQ)/(xP-xQ))))
+    else:
+        if rP > rQ:
+            thetaDiff = 0
+        else:
+            thetaDiff = math.pi
+    return (rDiff, thetaDiff)
 
-# print(polar_difference((1, 0), (2, 0)))
+# print(polar_difference((2, math.pi/4), (8, math.pi/6)))
 
 
 def order3(one, two, three):
@@ -62,7 +75,6 @@ def vowel_shift(S):
     shifted = []
     for i in range(0, len(S)):
         shifted.append(S[i])
-    print(shifted)
     vowelsL = ['a', 'e', 'i', 'o', 'u']
     vowelsU = ['A', 'E', 'I', 'O', 'U']
     for j in range(0, len(shifted)):
@@ -72,12 +84,11 @@ def vowel_shift(S):
                     shifted[j] = "a"
                 else:
                     shifted[j] = vowelsL[k + 1]
-                    break
+                    break  # ...or else it will shift more than once
             if (shifted[j] == vowelsU[k]):
                 if (shifted[j] == "U"):
                     shifted[j] = "A"
                 else:
                     shifted[j] = vowelsU[k + 1]
-                    break
-    shifted = str(shifted)
-    return shifted
+                    break  # ...or else it will shift more than once
+    return str(shifted)
