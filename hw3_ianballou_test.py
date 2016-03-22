@@ -29,6 +29,9 @@ def analyze(count_dictionary):
     return longerThan1Count, set(mostFreq), set(longest)
 print(analyze(word_count("This is y y y y y y a a a a a a(test! Imaginary people woah creaTions")))
 
+text = """This is a short short short test of the program.
+I hope the program performs well.  If my hope is dashed, I will accept the verdict"""
+
 
 def top_words(count_dictionary, n):
     mostNFreq = []
@@ -42,4 +45,4 @@ def top_words(count_dictionary, n):
         count += 1
     return mostNFreq
 
-print(top_words(word_count(text), 4))
+print(top_words(word_count(text), 3))
