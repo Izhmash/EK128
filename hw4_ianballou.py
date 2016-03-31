@@ -21,19 +21,15 @@ student_name = "Ian Ballou"
 
 
 def single_step(D, T_current):
-    # print(T_current)
     L = len(T_current)
     if L < 3:
         return
     T_nextStep = np.empty(L)
+    # Slicing method to compute next step
     delta0 = T_current[1:] - T_current[:-1]
-    # print(delta0)
     result = np.zeros(L)
-    # print(result)
     result[:-1] += delta0
-    # print(result)
     result[1:] -= delta0
-    # print(result)
     T_nextStep = T_current+D*result
     return T_nextStep
 
@@ -68,9 +64,11 @@ plt.plot(devs, 'ro')
 plt.show()"""
 
 
-arTest = np.empty(51)
-arTest[25] = 100
+# arTest = np.empty(51)
+# arTest[25] = 100
+ 
 
+# Prints a graph of the standard deviations with 300 steps
 def simulation(D, a):
     devs = np.empty(300)
     devs[0] = stats(a)[1]
@@ -81,7 +79,7 @@ def simulation(D, a):
     plt.plot(devs, 'b-')
     plt.plot(devs, 'ro')
     plt.show()
-simulation(.02, arTest)
+# simulation(.02, arTest)
 """
 # # HW4 Result Checker
 # This notebook contains a checker for results from HW4.
