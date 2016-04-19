@@ -1,0 +1,5 @@
+Team members: Ian Ballou, Lina Lin Wei
+
+Project: Make a few levels of Python Pac Man using Pygame. 
+If finished early, implement a custom motion-based wireless controller.  
+Controller will consist of 9-degree-of-freedom (9-Dof) device attached to an Arduino, with data being transmitted via XBee radio.   
