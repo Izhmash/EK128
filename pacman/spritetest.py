@@ -6,8 +6,8 @@ screen = pygame.display.set_mode((640, 480))
 
 ss = SpriteSheet('pacmansprites2.png')
 
-image0 = ss.get_image(0, 0, 20, 20)
-image1 = ss.get_image(20, 0, 20, 20)
+image0 = ss.get_image(20, 40, 20, 20)
+image1 = ss.get_image(0, 40, 20, 20)
 image2 = ss.get_image(40, 0, 20, 20)
 image3 = ss.get_image(0, 20, 20, 20)
 
