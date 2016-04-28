@@ -2,43 +2,66 @@ from SpriteSheet import SpriteSheet
 import sys
 import os
 import pygame
+import random
 
 
-BACKGROUND = pygame.image.load('pacmansprites2.png')
+BACKGROUND = pygame.image.load('blackbox.jpg')
 BACKGROUND = pygame.transform.scale(BACKGROUND, (800, 600))
 BACKGROUND_RECT = BACKGROUND.get_rect()
+
+
+class Fruit(pygame.sprite.Sprite):
+    def __init__(self, x0, y0):
+        pygame.sprite.Sprite.__init__(self)
+        self.ss = SpriteSheet('pacmansprites2.png')
+        self.image = self.ss.get_image(175, 165, 15, 15)
+        self.rect = self.image.get_rect(x=x0, y=y0)
+        self.eaten = False
+
+
+    def checkCollision(self, sprite):
+        if self.rect.colliderect(sprite.rect):
+            self.eaten = True
+            print("Collision")
+
+    
+    def isEaten(self):
+        return self.eaten 
+
 
 # Remember: image is part of sprite, used for drawing 
 class Pacman(pygame.sprite.Sprite):
     def __init__(self, x0, y0):
         pygame.sprite.Sprite.__init__(self)
         self.ss = SpriteSheet('pacmansprites2.png')
-        self.leftAnim = [self.ss.get_image(20, 0, 20, 20),\
-                    self.ss.get_image(0, 0, 20, 20),\
-                    self.ss.get_image(40, 0, 20, 20)]
-        self.rightAnim = [self.ss.get_image(20, 20, 20, 20),\
-                    self.ss.get_image(0, 20, 20, 20),\
-                    self.ss.get_image(40, 0, 20, 20)]
-        self.upAnim = [self.ss.get_image(20, 40, 20, 20),\
-                    self.ss.get_image(0, 40, 20, 20),\
-                    self.ss.get_image(40, 0, 20, 20)]
-        self.downAnim = [self.ss.get_image(20, 60, 20, 20),\
-                    self.ss.get_image(0, 60, 20, 20),\
-                    self.ss.get_image(40, 0, 20, 20)]
-        self.leftV = -2
-        self.rightV = 2
-        self.upV = -2
-        self.downV = 2
+        self.leftAnim = [self.ss.get_image(25, 5, 15, 15),\
+                    self.ss.get_image(5, 5, 15, 15),\
+                    self.ss.get_image(45, 5, 15, 15)]
+        self.rightAnim = [self.ss.get_image(25, 25, 15, 15),\
+                    self.ss.get_image(5, 25, 15, 15),\
+                    self.ss.get_image(45, 5, 15, 15)]
+        self.upAnim = [self.ss.get_image(25, 45, 15, 15),\
+                    self.ss.get_image(5, 45, 15, 15),\
+                    self.ss.get_image(45, 5, 15, 15)]
+        self.downAnim = [self.ss.get_image(25, 65, 15, 15),\
+                    self.ss.get_image(5, 65, 15, 15),\
+                    self.ss.get_image(45, 5, 15, 15)]
+        self.leftV = -3
+        self.rightV = 3
+        self.upV = -3
+        self.downV = 3
         self.image = self.leftAnim[1]
         self.imageIndex = 1 
-        self.rect = self.image.get_rect(x=x0, y=y0)
+        # self.rect = self.image.get_rect(x=x0, y=y0)
+        self.rect = pygame.Rect(0, 0, 40, 40)
+        # self.radius = 5
         self.vX = self.rightV
         self.vY = 0
         self.timer = 0.0
 
 
     def move(self):
-        self.image = self.animate()
+        self.image = pygame.transform.scale(self.animate(), (40, 40))
         self.rect.x += self.vX
         self.rect.y += self.vY
 
@@ -105,10 +128,15 @@ class Game(object):
         self.screen = self.initPygame()
         self.screenRect = self.screen.get_rect()
         self.pacmanGroup = self.initPacman()
+        self.fruitGroup = self.initFruit()
         self.done = False
         self.clock = pygame.time.Clock()
         self.fps = 60
         self.currentTime = 0.0
+        self.score = 0
+        self.font = pygame.font.Font(None, 36)
+        self.maxTime = 5000 # In ms
+        self.timeLeft = self.maxTime - self.currentTime
         # self.pacman = Pacman(100, 500)
 
    
@@ -116,6 +144,8 @@ class Game(object):
         spriteGroup = pygame.sprite.Group()
         pacman = Pacman(0, 0)
         spriteGroup.add(pacman)
+        # pacman2 = Pacman(40, 40)
+        # spriteGroup.add(pacman2)
         return spriteGroup
 
 
@@ -126,16 +156,65 @@ class Game(object):
         screen = pygame.display.set_mode((800, 600))
         return screen
     
-    
+   
+    def initFruit(self):
+        spriteGroup = pygame.sprite.Group()
+        fruit = Fruit(100, 150)
+        spriteGroup.add(fruit)
+        return spriteGroup
+
+
+    def updateFruit(self):
+        for fruit in self.fruitGroup:
+            fruit.checkCollision(self.pacmanGroup.sprites()[0])
+            if fruit.isEaten():
+                self.fruitGroup.remove(fruit)
+                self.score += 1
+                self.maxTime += 1750
+        if len(self.fruitGroup.sprites()) < 1:
+            random.seed(self.currentTime)
+            x = random.randint(0, 700)
+            y = random.randint(0, 500)
+            fruit = Fruit(x, y)
+            self.fruitGroup.add(fruit)
+
+
+    def updateText(self):
+        scoreText = self.font.render(str(self.score), 1, (255, 255, 255))
+        scoreRect = scoreText.get_rect()
+        scoreRect.centerx = 400
+        scoreRect.centery = 580
+        self.screen.blit(scoreText, scoreRect)
+
+        enText = self.font.render("Energy", 1, (255, 255, 255))
+        enRect = enText.get_rect()
+        enRect.centerx = 600
+        enRect.centery = 580
+        self.screen.blit(enText, enRect)
+
+        timeText = self.font.render(str(self.timeLeft), 1, (255, 255, 255))
+        timeRect = timeText.get_rect()
+        timeRect.centerx = 700
+        timeRect.centery = 580
+        self.screen.blit(timeText, timeRect)
+
+
     def update(self):
-        while not self.done:
+        while not self.done and self.timeLeft > 0:
             self.currentTime = pygame.time.get_ticks()
+            self.timeLeft = self.maxTime - self.currentTime
             self.keys = self.getUserInput()
             self.pacmanGroup.update(self.currentTime, self.keys)
+            # pygame.draw.rect(self.screen, (0, 0, 255), self.pacmanGroup.sprites()[0].rect)
+            # pygame.display.flip()
+            self.updateFruit()
             self.screen.blit(BACKGROUND, BACKGROUND_RECT)
+            self.updateText()
             self.pacmanGroup.draw(self.screen)
+            self.fruitGroup.draw(self.screen)
             pygame.display.update()
             self.clock.tick(self.fps)
+        self.endScreen(self.keys)
 
 
     def getUserInput(self):
@@ -145,6 +224,47 @@ class Game(object):
 
         keys = pygame.key.get_pressed()
         return keys 
+
+    
+    def endScreen(self, keys):
+        self.screen.blit(BACKGROUND, BACKGROUND_RECT)
+        finishInfoText = self.font.render("Final Score:", 1, (255, 255, 255))
+        finishInfoRect = finishInfoText.get_rect()
+        finishInfoRect.centerx = 400
+        finishInfoRect.centery = 260
+        self.screen.blit(finishInfoText, finishInfoRect)
+        finishText = self.font.render(str(self.score), 1, (255, 255, 255))
+        finishRect = finishText.get_rect()
+        finishRect.centerx = 400
+        finishRect.centery = 300
+        self.screen.blit(finishText, finishRect)
+        enterText = self.font.render("Press enter to quit", 1, (255, 255, 255))
+        enterRect = enterText.get_rect()
+        enterRect.centerx = 400
+        enterRect.centery = 360
+        self.screen.blit(enterText, enterRect)
+        pygame.display.update()
+        disp = False
+        while not keys[pygame.K_RETURN]:
+            oldTime = pygame.time.get_ticks()
+            timer = pygame.time.get_ticks() - oldTime
+            keys = self.getUserInput()  
+            while timer < 500 and not keys[pygame.K_RETURN]:
+                timer = pygame.time.get_ticks() - oldTime
+                if disp:
+                    self.screen.blit(BACKGROUND, BACKGROUND_RECT)
+                    self.screen.blit(finishInfoText, finishInfoRect)
+                    self.screen.blit(finishText, finishRect)
+                    self.screen.blit(enterText, enterRect)
+                else: 
+                    self.screen.blit(BACKGROUND, BACKGROUND_RECT)
+                    self.screen.blit(finishInfoText, finishInfoRect)
+                    self.screen.blit(finishText, finishRect)
+                disp = not disp
+            pygame.display.update()
+
+
+
 
 
 game = Game()

@@ -9,7 +9,7 @@ ss = SpriteSheet('pacmansprites2.png')
 image0 = ss.get_image(20, 40, 20, 20)
 image1 = ss.get_image(0, 40, 20, 20)
 image2 = ss.get_image(40, 0, 20, 20)
-image3 = ss.get_image(0, 20, 20, 20)
+image3 = ss.get_image(175, 165, 15, 15)
 
 images = [image0, image1, image2]
 
@@ -23,11 +23,12 @@ while running:
     event = pygame.event.poll()
     if event.type == pygame.QUIT:
         running = 0
-    if animCnt % 4 == 0:
+    '''if animCnt % 4 == 0:
         screen.fill(pygame.Color('black'))
         screen.blit(images[counter], (0, 0))
         counter = counter + 1
     if counter == len(images):
-        counter = 0
+        counter = 0'''
+    screen.blit(image3, (0, 0))
     pygame.display.flip()
     clock.tick(60)  # 16.67 ms per frame
