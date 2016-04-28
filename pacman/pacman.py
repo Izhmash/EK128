@@ -193,7 +193,7 @@ class Game(object):
         self.currentTime = 0.0
         self.score = 0
         self.font = pygame.font.Font(None, 36)
-        self.maxTime = 20000 # In ms
+        self.maxTime = 15000 # In ms
         self.timeLeft = self.maxTime - self.currentTime
         self.level = level
         self.walls = []
@@ -225,7 +225,7 @@ class Game(object):
     def initPygame(self):
         os.environ['SDL_VIDEO_CENTERED'] = '1'
         pygame.init()
-        pygame.display.set_caption('Pac-Man')
+        pygame.display.set_caption('Eat-Man Ultra')
         screen = pygame.display.set_mode((800, 600))
         return screen
     
