@@ -3,6 +3,7 @@ import sys
 import os
 import pygame
 import random
+from level import level
 
 
 BACKGROUND = pygame.image.load('blackbox.jpg')
@@ -53,7 +54,7 @@ class Pacman(pygame.sprite.Sprite):
         self.image = self.leftAnim[1]
         self.imageIndex = 1 
         # self.rect = self.image.get_rect(x=x0, y=y0)
-        self.rect = pygame.Rect(0, 0, 40, 40)
+        self.rect = pygame.Rect(x0, y0, 30, 30)
         # self.radius = 5
         self.vX = self.rightV
         self.vY = 0
@@ -61,9 +62,41 @@ class Pacman(pygame.sprite.Sprite):
 
 
     def move(self):
-        self.image = pygame.transform.scale(self.animate(), (40, 40))
+        self.image = pygame.transform.scale(self.animate(), (30, 30))
         self.rect.x += self.vX
         self.rect.y += self.vY
+    
+
+    
+    def checkWallCollision(self, wallRects):
+        for wall in wallRects:
+            if self.rect.colliderect(wall.rect):
+                if self.vX == self.rightV:
+                    while self.rect.colliderect(wall.rect):
+                        self.rect.x -= 3
+                    self.rect.x -= 3
+                    #self.vX = self.leftV
+                    #self.vY = 0
+                if self.vX == self.leftV:
+                    while self.rect.colliderect(wall.rect):
+                        self.rect.x += 3
+                        self.rect.x += 3
+                    #self.vX = self.rightV
+                    #self.vY = 0
+                if self.vY == self.downV:
+                    while self.rect.colliderect(wall.rect):
+                        self.rect.y -= 3
+                    self.rect.y -= 3
+                    #self.vY = self.upV
+                    #self.vX = 0
+                if self.vY == self.upV:
+                    while self.rect.colliderect(wall.rect):
+                        self.rect.y += 3
+                    self.rect.y += 3
+                    #self.vY = self.downV
+                    #self.vX = 0
+
+                print("Wall Collision")
 
 
     def animate(self):
@@ -101,10 +134,11 @@ class Pacman(pygame.sprite.Sprite):
             return self.downAnim[self.imageIndex]
 
 
-    def update(self, currentTime, keys):
+    def update(self, currentTime, keys, wallRects):
         self.currentTime = currentTime
         self.handleInput(keys)
         self.move()
+        self.checkWallCollision(wallRects)
 
 
 
@@ -123,6 +157,11 @@ class Pacman(pygame.sprite.Sprite):
             self.vX = 0
 
 
+class Wall(object):
+    def __init__(self, pos):
+        self.rect = pygame.Rect(pos[0], pos[1], 20, 20)
+
+
 class Game(object):
     def __init__(self):
         self.screen = self.initPygame()
@@ -135,14 +174,28 @@ class Game(object):
         self.currentTime = 0.0
         self.score = 0
         self.font = pygame.font.Font(None, 36)
-        self.maxTime = 5000 # In ms
+        self.maxTime = 99999999 # In ms
         self.timeLeft = self.maxTime - self.currentTime
+        self.level = level
+        self.walls = []
+        self.initLevel()
         # self.pacman = Pacman(100, 500)
 
-   
+
+    def initLevel(self):
+        x = y = 0
+        for row in self.level:
+            for col in row:
+                if col == "W":
+                    self.walls.append(Wall((x, y)))
+                x += 20
+            y += 20
+            x = 0
+
+
     def initPacman(self):
         spriteGroup = pygame.sprite.Group()
-        pacman = Pacman(0, 0)
+        pacman = Pacman(50, 80)
         spriteGroup.add(pacman)
         # pacman2 = Pacman(40, 40)
         # spriteGroup.add(pacman2)
@@ -204,11 +257,13 @@ class Game(object):
             self.currentTime = pygame.time.get_ticks()
             self.timeLeft = self.maxTime - self.currentTime
             self.keys = self.getUserInput()
-            self.pacmanGroup.update(self.currentTime, self.keys)
+            self.pacmanGroup.update(self.currentTime, self.keys, self.walls)
             # pygame.draw.rect(self.screen, (0, 0, 255), self.pacmanGroup.sprites()[0].rect)
             # pygame.display.flip()
             self.updateFruit()
             self.screen.blit(BACKGROUND, BACKGROUND_RECT)
+            for wall in self.walls:
+                pygame.draw.rect(self.screen, (136, 0, 137), wall.rect)
             self.updateText()
             self.pacmanGroup.draw(self.screen)
             self.fruitGroup.draw(self.screen)
