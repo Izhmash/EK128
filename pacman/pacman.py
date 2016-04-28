@@ -25,7 +25,19 @@ class Fruit(pygame.sprite.Sprite):
             self.eaten = True
             print("Collision")
 
-    
+
+    def checkWallCollision(self, wallRects):
+        for wall in wallRects:
+            while self.rect.colliderect(wall.rect):
+                self.rect.x += 15
+                if self.rect.x > 799:
+                    self.rect.x = 80
+        for wall in wallRects:
+            if self.rect.colliderect(wall.rect):
+                return False
+            else:
+                return True
+                
     def isEaten(self):
         return self.eaten 
 
@@ -64,7 +76,15 @@ class Pacman(pygame.sprite.Sprite):
     def move(self):
         self.image = pygame.transform.scale(self.animate(), (30, 30))
         self.rect.x += self.vX
+        if self.rect.x > 800:
+            self.rect.x = 1
+        if self.rect.x < 0:
+            self.rect.x = 799
         self.rect.y += self.vY
+        if self.rect.y > 600:
+            self.rect.y = 1
+        if self.rect.y < 0:
+            self.rect.y = 599
     
 
     
@@ -73,28 +93,28 @@ class Pacman(pygame.sprite.Sprite):
             if self.rect.colliderect(wall.rect):
                 if self.vX == self.rightV:
                     while self.rect.colliderect(wall.rect):
-                        self.rect.x -= 3
-                    self.rect.x -= 3
-                    #self.vX = self.leftV
-                    #self.vY = 0
+                        self.rect.x -= 1
+                    self.rect.x -= 1
+                    # self.vX = self.leftV
+                    self.vY = 0
                 if self.vX == self.leftV:
                     while self.rect.colliderect(wall.rect):
-                        self.rect.x += 3
-                        self.rect.x += 3
-                    #self.vX = self.rightV
-                    #self.vY = 0
+                        self.rect.x += 1
+                    self.rect.x += 1
+                    # self.vX = self.rightV
+                    self.vY = 0
                 if self.vY == self.downV:
                     while self.rect.colliderect(wall.rect):
-                        self.rect.y -= 3
-                    self.rect.y -= 3
-                    #self.vY = self.upV
-                    #self.vX = 0
+                        self.rect.y -= 1
+                    self.rect.y -= 1
+                    # self.vY = self.upV
+                    self.vX = 0
                 if self.vY == self.upV:
                     while self.rect.colliderect(wall.rect):
-                        self.rect.y += 3
-                    self.rect.y += 3
-                    #self.vY = self.downV
-                    #self.vX = 0
+                        self.rect.y += 1
+                    self.rect.y += 1
+                    # self.vY = self.downV
+                    self.vX = 0
 
                 print("Wall Collision")
 
@@ -146,13 +166,13 @@ class Pacman(pygame.sprite.Sprite):
         if keys[pygame.K_UP]:
             self.vY = self.upV
             self.vX = 0
-        elif keys[pygame.K_RIGHT]:
+        if keys[pygame.K_RIGHT]:
             self.vY = 0
             self.vX = self.rightV
-        elif keys[pygame.K_LEFT]:
+        if keys[pygame.K_LEFT]:
             self.vY = 0
             self.vX = self.leftV
-        elif keys[pygame.K_DOWN]:
+        if keys[pygame.K_DOWN]:
             self.vY = self.downV
             self.vX = 0
 
@@ -167,18 +187,18 @@ class Game(object):
         self.screen = self.initPygame()
         self.screenRect = self.screen.get_rect()
         self.pacmanGroup = self.initPacman()
-        self.fruitGroup = self.initFruit()
         self.done = False
         self.clock = pygame.time.Clock()
         self.fps = 60
         self.currentTime = 0.0
         self.score = 0
         self.font = pygame.font.Font(None, 36)
-        self.maxTime = 99999999 # In ms
+        self.maxTime = 20000 # In ms
         self.timeLeft = self.maxTime - self.currentTime
         self.level = level
         self.walls = []
         self.initLevel()
+        self.fruitGroup = self.initFruit()
         # self.pacman = Pacman(100, 500)
 
 
@@ -214,6 +234,10 @@ class Game(object):
         spriteGroup = pygame.sprite.Group()
         fruit = Fruit(100, 150)
         spriteGroup.add(fruit)
+        cont = False
+        while not cont:
+            cont = fruit.checkWallCollision(self.walls)
+        # fruit.checkWallCollision(self.walls)
         return spriteGroup
 
 
@@ -223,13 +247,16 @@ class Game(object):
             if fruit.isEaten():
                 self.fruitGroup.remove(fruit)
                 self.score += 1
-                self.maxTime += 1750
+                self.maxTime += 2000
         if len(self.fruitGroup.sprites()) < 1:
             random.seed(self.currentTime)
-            x = random.randint(0, 700)
-            y = random.randint(0, 500)
+            x = random.randint(40, 760)
+            y = random.randint(100, 500)
             fruit = Fruit(x, y)
             self.fruitGroup.add(fruit)
+            cont = False
+            while not cont:
+                cont = fruit.checkWallCollision(self.walls)
 
 
     def updateText(self):
